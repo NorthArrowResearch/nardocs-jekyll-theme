@@ -6,11 +6,11 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Matthew Reimer"]
   spec.email         = ["matt.reimer@gmail.com"]
 
-  spec.summary       = %q{TODO: Write a short summary, because Rubygems requires one.}
+  spec.summary       = "A theme we developed for our client wikis"
   spec.homepage      = "TODO: Put your gem's website or public repo URL here."
   spec.license       = "MIT"
 
-  spec.files         = `git ls-files -z`.split("\x0").select { |f| f.match(%r{^(images|_layouts|_includes|css|js|LICENSE|README)}i) }
+  spec.files         = `git ls-files -z`.split("\x0").select { |f| f.match(%r{^(images|_layouts|_includes|css|js|LICENSE|README.md)}i) }
 
   spec.add_runtime_dependency "jekyll", "~> 3.4"
 
