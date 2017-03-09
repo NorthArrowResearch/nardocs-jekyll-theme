@@ -52,7 +52,6 @@ section {
 // The Header 
 header { 
   text-shadow: 3px 3px 3px rgba(0,0,0,0.7);
-  background-image: url($siteurl + "/images/theme/home.png");
   background-repeat: no-repeat;
   background-position: 0% 50%;
   background-size: cover;
@@ -87,7 +86,6 @@ header {
 }
 
 .top-bar{
-  
   // Links in gereral
   a { color: #DDDDDD; }
   a:hover, a:focus { color: white; }

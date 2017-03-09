@@ -71,7 +71,7 @@ $(document).ready(function (){
 		var $topbar = $('<div class="top-bar"></div>');
 		var $topbarleft = $('<div class="top-bar-left"></div>');
 		$topbar.append($topbarleft);
-		var $title = $('<li class="menu-text">Title</li>');
+		var $title = $('<li><a href="'+NAVHome+'">'+NAVTitle+'</li>');
 
 		function menutraverse(t, $mUL) {
 			if (!$mUL) {
