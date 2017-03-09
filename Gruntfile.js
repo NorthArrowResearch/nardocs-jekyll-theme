@@ -12,7 +12,7 @@ module.exports = function(grunt) {
             cssDir: 'assets/css',
             includePaths: [
               'node_modules/foundation-sites/scss',
-              'node_modules/foundation-sites/scss/util'
+              'node_modules/font-awesome/scss',
             ]
         },
         build: {
