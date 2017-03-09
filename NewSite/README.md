@@ -3,6 +3,12 @@
 
 ## Working locally
 
+
+
+```
+bundle install --path .vendor/bundle
+```
+
 To get the latest theme:
 
 ```

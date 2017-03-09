@@ -137,6 +137,7 @@ $(document).ready(function (){
 
 	// Initialize our UI framework
 	$(document).foundation();
+	$('#toc').toc();
 
 });
 
