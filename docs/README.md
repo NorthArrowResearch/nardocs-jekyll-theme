@@ -1,10 +1,4 @@
 
-## Where to find things
-
-For overall [Riverscapes Documentation](http://riverscapes.northarrowresearch.com/), see the following techncial references:
-* [Guidelines for Documenting a Riverscapes Model](http://riverscapes.northarrowresearch.com/Technical_Reference/how_to_document_a_model.html)
-* [Cheatsheets on Jekyll Toolbox Documentation](http://riverscapes.northarrowresearch.com/Technical_Reference/jekyll_toolbox.html)- this is how you get the page titles (`title: Page Title`) to work, the proper behavior in the site table of contents, and a whole host of other issues.
-* [Theming a Jekyll Site](http://riverscapes.northarrowresearch.com/Technical_Reference/applying_theme.html) - This is how to apply the Riverscapes theme to your site.
 
 ### Site templates and HTML
 

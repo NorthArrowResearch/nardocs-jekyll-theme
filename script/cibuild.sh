@@ -12,4 +12,4 @@ else
   exit 1
 fi
 
-gem build riverscapes-jekyll-theme.gemspec
+gem build nardocs-jekyll-theme.gemspec

@@ -1,5 +1,5 @@
 ---
-title: ThingsA Riverscapes Consortium
+title: ThingsA NARDOCS Consortium
 weight: 1
 ---
 
