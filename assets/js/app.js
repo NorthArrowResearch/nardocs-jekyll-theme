@@ -9,29 +9,46 @@ $(document).ready(function (){
 	 * @return {[type]}
 	 */
 	// Now place each item in the tree
-	function treeize(pages){
+	function treeize(pages) {
 		var t = { leaves: [], branches: [] }
+		
 		for (i in pages) {
-			urlArr = pages[i].url.split('/');
-			currLevel = urlArr.shift();
+			
+			var urlArr = pages[i].url.split('/');
+			var currLevel = urlArr.shift();
 			var pointer = t;
+
+			// For some reason the GH Pages jekyll detects style.css as a page.
+			if (urlArr[0] === "assets") continue
 
 			// Now loop until we're deep enough
 			while (urlArr.length > 1) {
-				key = urlArr[0].length == 0 ? "EMPTY" : urlArr[0];
-				var newDir;
-				if (key in pointer.branches){
-					newDir = pointer.branches[key];
+				var key = urlArr[0].length == 0 ? "EMPTY" : urlArr[0];
+				key = key.replace("_"," ").replace("%20", " ");
+				var newDir = null;
+
+				var thebranch = pointer.branches.filter(function(br){
+					return br.key == key
+				})
+				if (thebranch.length > 0){
+					newDir = thebranch[0];
 				}
 				else {
-					newDir = { leaves: [], branches: {} }
-					pointer.branches[key] = newDir;					
+					newDir = { key: key, leaves: [], branches: [] }
+					pointer.branches.push(newDir);					
 				}
 				pointer = newDir;
 				currLevel = urlArr.shift();
 			}
-			pointer.leaves.push(pages[i]);		
-		}
+			if (urlArr[0] == "index.html" || urlArr[0] == ""){
+				pointer.title = pages[i].title;
+				pointer.index = pages[i];
+			}
+			else{
+				pointer.title = pointer.key;
+				pointer.leaves.push(pages[i]);				
+			}			
+		}	
 		traverseandsort(t)
 		return t
 	}
@@ -42,6 +59,20 @@ $(document).ready(function (){
 	 * @return {[type]}
 	 */
 	function traverseandsort(t) {
+		// Now sort branches at this level
+		t.branches.sort(function(a,b) {
+			a.weight = a.index && a.index.weight ? parseInt(a.index.weight) : 999;
+			b.weight = b.index && b.index.weight ? parseInt(b.index.weight) : 999;
+
+			if (a.weight == b.weight) {
+				return a.title < b.title ? -1 : (a.title > b.title ? 1 : 0);
+			}
+			else {
+				return a.weight < b.weight ? -1 : (a.weight > b.weight ? 1 : 0);
+			}
+			return true;
+		});
+
 		// Sort the leaves by weight and then by title
 		t.leaves.sort(function(a, b) {
 
@@ -54,8 +85,9 @@ $(document).ready(function (){
 			else {
 				return a.weight < b.weight ? -1 : (a.weight > b.weight ? 1 : 0);
 			}
-
 		});
+
+
 		// Now go find more branches to sort their leaves
 		for (br in t.branches) {
 			traverseandsort(t.branches[br])
@@ -63,73 +95,170 @@ $(document).ready(function (){
 	}	
 
 	/**
-	 * Turn a tree structure from treeize into a topbar
+	 * Turn a tree structure from SiteSettings.topmenu into a foundation topbar
 	 * @param  {[type]}
 	 * @return {[type]}
 	 */
-	function topbarize(tree, title) {
-		var $topbar = $('<div class="top-bar"></div>');
-		var $topbarleft = $('<div class="top-bar-left"></div>');
-		$topbar.append($topbarleft);
-		var $title = $('<li><a href="'+NAVHome+'">'+NAVTitle+'</li>');
+	function topbarize() {
+		// The Mobile menu
+		$topbarContainer = $('<div></div>')
 
-		function menutraverse(t, $mUL) {
-			if (!$mUL) {
-				$mUL = $('<ul class="dropdown menu" data-dropdown-menu></ul>');
-				$mUL.append($title);
+		var tree = SiteSettings.topmenu
+
+		// Otherwise we get a proper menu
+		$mobilediv = $('<div class="title-bar" data-responsive-toggle="responsive-menu" data-hide-for="medium"></div>');
+		$mobilediv.append($('<button class="menu-icon" type="button" data-toggle="responsive-menu"></button>'))
+		$mobilediv.append($('<div class="title-bar-title"><a href="' + NAVHome + '/">'+NAVTitle+'</a></div>'))
+		
+		$topbarContainer.append($mobilediv)
+
+		var $topbar = $('<div class="top-bar" id="responsive-menu"></div>');
+		var $topbarleft = $('<div class="top-bar-left"><ul class="dropdown menu" data-dropdown-menu><li class="show-for-medium"><a id="topbarLogo" href="http://riverscapes.xyz/">Riverscapes Consortium</a></li></ul></div>')
+		var $topbarright = $('<div class="top-bar-right"></div>');
+		$topbar.append($topbarleft);
+		
+		function menutraverse(t, first) {
+			if (!first) first = false;
+			// First time round
+			var $mUL = $('<ul class="submenu menu vertical" data-submenu></ul>');
+			if (first){
+				var $mUL = $('<ul class="dropdown menu" data-dropdown-menu></ul>');
 			}
-			// Now go find more branches to sort their leaves
-			for (lf in t.leaves) {
-				$li = $('<li><a href="' + t.leaves[lf].absurl + '">' + t.leaves[lf].title + '</a></li>');
-				$mUL.append($li);
-			}				
-			// Now go find more branches to sort their leaves
-			for (br in t.branches) {
-				$newmLi = $('<li></li>');
-				$newmA = $('<a href="#">'+ br +'</a>');
-				$newmUl = $('<ul class="menu vertical"></ul>');
-				$newmLi.append($newmA);
-				$newmLi.append($newmUl);
-				$mUL.append($newmLi);
-				menutraverse(t.branches[br], $newmUl);
+				
+			function urlize(item){
+				var newurl = "#";
+				var target = "";
+				var title = item.title;
+				if (item.url){
+					// Is the URL absolute or relative?
+					if (item.url.indexOf("http") != 0) {
+						newurl = NAVHome + '/' + item.url;	
+					}
+					else{
+						newurl = item.url;
+						target = 'target="_blank"';							
+					}	
+				}				
+				return $('<a href="' + newurl + '" ' + target + '>' + title + '</a>');
+			}
+
+			// Loop over the immediate children
+			for (cind in t) {
+				// Now go find more branches to sort their leaves m656
+				if (t[cind].children && t[cind].children.length > 0){
+
+					var $li = $('<li class="has-submenu"></li>');
+					$li.append(urlize(t[cind]))
+					$li.append(menutraverse(t[cind].children));
+					$mUL.append($li);
+				}
+				else {
+					var $mLi = $('<li></li>');
+					$mLi.append(urlize(t[cind]));
+					$mUL.append($mLi);
+				}
 			}
 			return $mUL;			
 		}
 
-		$topbarleft.append(menutraverse(tree));
-		return $topbar
+		// Only build the menu if it's specified in the config.yaml file
+		if (tree){
+			$topbarright.append(menutraverse(tree, true));
+			$topbar.append($topbarright);	
+		}
+
+
+		$topbarContainer.append($topbar);
+		return $topbarContainer;
 	}
 
+// Extract the url parameter from the name you want
+function getUrlParameter(name) {
+	name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+	var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+	var results = regex.exec(location.search);
+	return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+};
+
 	/**
-	 * Turn a tree structure from treeize into a topbar
+	 * Turn a tree structure from treeize into a foundation sidebar accordion 
 	 * @param  {[type]}
 	 * @return {[type]}
 	 */
 	function accordionize(t, $mUL) {
+		// The first time we have to build the ul
 		if (!$mUL) {
-			$mUL = $('<ul class="vertical menu" data-accordion-menu></ul>');
+			$mUL = $('<ul id="topmenu" class="vertical menu accordion-menu hide" data-accordion-menu data-submenu-toggle="true"></ul>');
+			// If we've elected to have a home item then use it
+			try {
+				if (SiteSettings.sideMenu.homeItem === true){
+					$li = $('<li class="leaf home"><a href="' + NAVHome + '/"><i class="icon"/>Home</a></li>');
+					$mUL.append($li);
+				}
+			} catch (error) {}
 		}
 		// Now go find more branches to sort their leaves
 		for (lf in t.leaves) {
-			$li = $('<li><a href="' + t.leaves[lf].absurl + '">' + t.leaves[lf].title + '</a></li>');
-			$mUL.append($li);
+			$li = $('<li class="leaf page"><a href="' + t.leaves[lf].absurl + '"><i class="icon"/>' + t.leaves[lf].title + '</a></li>');
+			var extSplit = t.leaves[lf].url.split('.');
+			if (extSplit.length == 1 || extSplit[extSplit.length -1] == "html") 
+				$mUL.append($li);
 		}				
 		// Now go find more branches to sort their leaves
-		for (br in t.branches) {
-			$newmLi = $('<li></li>');
-			$newmA = $('<a href="#">'+ br +'</a>');
+		for (brind in t.branches) {
+			$newmLi = $('<li class="branch"></li>');
+			var br = t.branches[brind];
+
+			if (br.index){
+				$newmA = $('<a class="reallink" href="' + br.index.absurl + '"><i class="icon"/>' + br.index.title + '</a>');
+			}
+			else{
+				var title = br.title || br.key;
+				$newmA = $('<a class="nolink" href="#"><i class="icon"/>'+ title +'</a>');
+			}
 			$newmUl = $('<ul class="menu vertical nested"></ul>');
 			$newmLi.append($newmA);
 			$newmLi.append($newmUl);
 			$mUL.append($newmLi);
-			accordionize(t.branches[br], $newmUl);
+			accordionize(br, $newmUl);
 		}
 		return $mUL;			
 	}
 
+
+	/**
+	 * The redirector only does its job if we have a valid query string
+	 * @param {*} appkey 
+	 */
+	function redirector(){
+		var appkey = getUrlParameter("APPKEY");
+		if (appkey && appkey.length > 0 && APPREDIRECTS && APPREDIRECTS[appkey]){
+			window.location.replace(NAVHome + "/" + APPREDIRECTS[appkey]);
+		}
+	}
+
+	/**
+	 * This  is our function for expanding to the current item (page)
+	 * 
+	 * @param {any} $sidebar 
+	 */
+	function expandCurentAccordion($sidebar) {
+		$menuEl = $sidebar.find("[href='"+window.location.pathname+"']");
+		$menuEl.addClass('menuActive');
+
+		$immediateChild = $menuEl.parent().find('ul');
+		$immediateChild.addClass('menuActive');
+		$sidebar.foundation('down', $immediateChild);
+		
+		menuancestry = $menuEl.parentsUntil($sidebar);
+		menuancestry.each(function(key, val){
+			$sidebar.foundation('down', $(val));
+		})
+	}
+
 	// Do all the things to get the tree
 	tree = treeize(NAVPages);
-	$topbar = topbarize(tree);
+	$topbar = topbarize();
 	$sidebarnav = accordionize(tree);
 
 	$('#topbarnav').append($topbar);
@@ -137,7 +266,40 @@ $(document).ready(function (){
 
 	// Initialize our UI framework
 	$(document).foundation();
-	$('#toc').toc();
+	expandCurentAccordion($sidebarnav);
 
+	// Rewrite a few of the interactions with the menu3
+	$('#topmenu i.icon').click(function(e){
+			e.stopPropagation();
+			e.preventDefault();
+			$(e.toElement).parent().siblings('button').click();
+	})
+	$('#topmenu li.branch a.nolink').click(function(e){
+		e.preventDefault();
+		$(e.toElement).siblings('button').click();
+})
+	
+	// Bind our buttons to menu actions
+	if (SiteSettings.sideMenu.startExpanded){
+		$sidebarnav.foundation('showAll');
+	}
+	$('#menuCtls #expand').click(function(){
+		$sidebarnav.foundation('showAll');
+	});
+	$('#menuCtls #contract').click(function(){
+		$sidebarnav.foundation('hideAll');
+		expandCurentAccordion($sidebarnav);
+	});
+
+	$('#toc').toc();
+	// $('#toc').prepend('<h4 class="show-for-medium"><span class="fa fa-file-text"></span> Page Contents:</h4>')
+
+	// See if we need to do a redirect
+	redirector();	
+
+	// Now turn off the dumb nav and turn on the smart one 
+	$('#sidenav #topmenu').removeClass('hide');
+	$('#sidenav #HTMLOnlyNav').addClass('hide');
 });
+
 

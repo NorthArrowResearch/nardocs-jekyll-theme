@@ -1,19 +1,13 @@
-# nardocs-jekyll-theme
+# Site Template for Nardocs Docs folders
 
-The CSS is built using grunt 
+This is the main template for `/docs` folders in Nardocs. Think of it as the central theme repository where bugs get fixed. 
 
-### Building a DEV environment
+## How do I create a new Github pages site?
 
-1. Clone the repo
-2. run `npm install`
-3. run `bundle install`
-4. run `grunt`
+1. clone this repo
+2. Copy the `/docs` folder from this repo into the root of your new repo
+2. Open `/docs/_config.yml` and follow the instructions 
 
+## How do I (Other)
 
-### Compiling CSS
-
-```
-grunt
-```
-
-
+See Jekyll docs regarding Gem themes.
