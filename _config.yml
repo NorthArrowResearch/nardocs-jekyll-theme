@@ -12,6 +12,9 @@ markdown: kramdown
 # Syntax highlighter.
 highlighter: rouge
 
+# Header images must be in /assets/images
+# headerImage: SomeHeader.png
+
 # front matter
 defaults:
   -

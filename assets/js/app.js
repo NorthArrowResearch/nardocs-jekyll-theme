@@ -187,7 +187,7 @@ function getUrlParameter(name) {
 		// The first time we have to build the ul
 		if (!$mUL) {
 			$mUL = $('<ul id="topmenu" class="vertical menu accordion-menu hide" data-accordion-menu data-submenu-toggle="true"></ul>');
-			// If we've elected to have a home item then use it
+			// If we've elected to have a homcd ..e item then use it
 			try {
 				if (SiteSettings.sideMenu.homeItem === true){
 					$li = $('<li class="leaf home"><a href="' + NAVHome + '/"><i class="icon"/>Home</a></li>');

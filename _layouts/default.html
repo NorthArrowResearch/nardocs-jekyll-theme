@@ -36,6 +36,15 @@
 
   <body>
 
+
+  {% if site.headerImage %}
+  <style>
+    header { 
+      background-image: url('../assets/images/{{site.headerImage}}');
+    }
+  </style>
+  {% endif %}
+
   <header>
     <div id="topbarnav"></div>
     <div id="headcallout" class="text-center callout large">

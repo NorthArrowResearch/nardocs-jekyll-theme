@@ -16,6 +16,9 @@ markdown: kramdown
 # Syntax highlighter.
 highlighter: rouge
 
+# Header images must be in /assets/images
+headerImage: SomeHeader.png
+
 # Choosing "default" layout means we don't need a "layout:default" in all our 
 # front matter
 defaults:
