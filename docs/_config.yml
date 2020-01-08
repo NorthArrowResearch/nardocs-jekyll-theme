@@ -56,11 +56,11 @@ settings:
   # Arbitrary multi-level topbar menu
   # IF you don't need this just comment out everything below
   # ----------------------------------
-  topmenu:
-    - title: "Nardocs"
-      childern:
-        - title: "Model Home"
-          url: index
+  # topmenu:
+  #   - title: "Nardocs"
+  #     childern:
+  #       - title: "Model Home"
+  #         url: index
 
 # Redirecting from apps can be tricky so we use a key-value system
 # key: must be in the set [A-Za-z0-9_] (no spaces, no dashes)

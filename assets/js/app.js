@@ -104,6 +104,7 @@ $(document).ready(function (){
 		$topbarContainer = $('<div></div>')
 
 		var tree = SiteSettings.topmenu
+		if (!tree) return
 
 		// Otherwise we get a proper menu
 		$mobilediv = $('<div class="title-bar" data-responsive-toggle="responsive-menu" data-hide-for="medium"></div>');
